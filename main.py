@@ -38,11 +38,19 @@ class Dataset (torch.utils.data.Dataset):
     # 模型神经网络
 class Module1 (nn.Module):
     def __init__(self):
-        pass
+        super(Module1, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self.fc1 = nn.Linear(32 * 64 * 64, 128)  # 假设 MelSpectrogram 输出尺寸为 128x128
+        self.fc2 = nn.Linear(128, 10)  # 假设有10个类别
 
-    def forward(self):
-        pass
-
+    def forward(self, x):
+        x = self.pool(self.relu(self.conv1(x)))
+        x = x.view(-1, 32 * 64 * 64)
+        x = self.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
 
 # 预处理，梅尔音频转化
 transform = MelSpectrogram(sample_rate=16000, n_mels=128)
