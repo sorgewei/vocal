@@ -16,7 +16,7 @@ print(f"Using device: {device}")
 
 # 数据集
 class Dataset (torch.utils.data.Dataset):
-    def __init__(self,data_dir,transform=None):
+    def __init__(self, data_dir, transform=None):
         self.transform = None
         self.data_dir = data_dir
         self.transform_dir = transform
@@ -62,7 +62,8 @@ writer = SummaryWriter(log_dir='./logs')
 # 优化器，损失函数
 loss_fn = nn.CrossEntropyLoss()
 learning_rate = 0.01
-optimizer = torch.optim.SGD(Module1.parameters(),lr=learning_rate)
+model = Module1().to(device)
+optimizer = torch.optim.SGD(model.parameters(),lr=learning_rate)
 
 
 # 训练
