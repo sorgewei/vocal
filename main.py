@@ -86,12 +86,12 @@ for epoch in range(epochs):
         optimizer.step()
         running_loss += loss.item()
 
-        train_step +=1
+        train_step += 1
 
         if train_step % 100 == 0:
             end_time = time.time()
             print(end_time - start_time)
-            print("训练次数：{},loss：{}".format(train_step, loss.item()))
+            print("训练次数：{}, loss：{}".format(train_step, loss.item()))
             writer.add_scalar("train_loss", loss.item(), train_step)
 
 #     测试步骤没写
