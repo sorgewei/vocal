@@ -1,6 +1,7 @@
 import os
 import torch
 import torchaudio
+from sympy.physics.units import length
 from torch import nn
 import torch.nn as nn
 from torch._export.db.examples.assume_constant_result import model
@@ -71,6 +72,10 @@ optimizer = torch.optim.SGD(model.parameters(),lr=learning_rate)
 epochs = 10
 train_step = 0
 start_time = time.time()
+
+total_train_step = 0  # 记录训练次数
+total_test_step = 0  # 记录测试次数
+
 for epoch in range(epochs):
     model.train()
     running_loss = 0.0
@@ -95,10 +100,33 @@ for epoch in range(epochs):
             print("训练次数：{}, loss：{}".format(train_step, loss.item()))
             writer.add_scalar("train_loss", loss.item(), train_step)
 
-#     测试步骤没写
+#     测试步骤
+    Module1.eval()
+    total_test_loss = 0
+    total_accuracy = 0
+    with torch.no_grad():  # 无梯度，不进行调优
+        for data in train_loader:
+            imgs, labels = data
+            imgs = imgs.to(device)
+            labels = labels.to(device)
+            outputs = Module1(imgs)
+            loss = loss_fn(outputs, labels)  # 该loss为部分数据在网络模型上的损失，为tensor数据类型
+            # 求整体测试数据集上的误差或正确率
+            total_test_loss = total_test_loss + loss.item()
+            accuracy = (outputs.argmax(1) == labels).sum()
+            total_accuracy = total_accuracy + accuracy
+        print("整体测试集上的Loss：{}".format(total_test_loss))
+        print("整体测试集上的正确率：{}".format(total_accuracy / length))  # 此处长度未赋值
+        writer.add_scalar("test_loss", total_test_loss, total_test_step)
+        writer.add_scalar("test_accuracy", total_test_loss, total_test_step, total_test_step)
+        total_test_step += 1
 
+        torch.save(Module1, "Module1_{}_gpu.pth".format(i))  # 保存
+        print("模型已保存")
 
 
 writer.close()
+
+
 
 
